@@ -1,39 +1,74 @@
 /**
- * ServiceNow breakOn functions
+ * Break on ServiceNow form field changes!
+ * This script will detect and break on any and all DOM changes
+ * to the chosen field.
  */
 
- //The breakOn API let's us break on object property changes
- function breakOnValueChange(fieldName){
-   var br = breakOn(g_form.getElement(fieldName), 'value');
- }
+ /** 
+  * Usage:
+  * --------------------
+  *
+  * 1. Run the script in the JavaScript console on any ServiceNow form
+  * 2. Call the following code in the JavaScript console:
+  *          snowMo.breakOnChange('enter your field name here', true);
+  *
+  * Example on the incident form:
+  *          snowMo.breakOnChange('incident.state', true);
+  *
+  * If you're looking to break on changes of other DOM elements,
+  * then set the second parameter of the breakOnChange function to false,
+  * and use a CSS selector for the first parameter.
+  *
+  * Example:
+  *          snowMo.breakOnChange('#add_icon', false);
+  *
+  */
 
- function breakOnVisibilityChange(fieldName){
-   var br = breakOn(document.getElementById(`element.${g_form.tableName}.${fieldName}`).style, 'visibility');
- }
+var snowMo = (() => {
 
- function breakOnReadOnlyChange(fieldName) {
-   //Since we need to detect changes to a DOM element attribute . . . bring in the MutationObserver!
-   var targetNode = document.getElementById(`${g_form.tableName}.${fieldName}`);
-   //We're going to be watching attribute changes
-   var config = {attributes: true};
+  function getTargetWindow(){
+    var targetWin;
+    if (window.g_form) {
+      targetWin = window;
+      return targetWin;
+    } else if (document.getElementById('gsft_main')) {
+      targetWin = document.getElementById('gsft_main').contentWindow
+      return targetWin;
+    } else {
+      return window;
+    }
+  }
 
-   // Callback to execute on attribute changes
-   var callback = function(mutationList) {
-     for(var mutation of mutationList) {
-       if (mutation.attributeName == "readonly") {
-         debugger;
-       }
-     }
-   }
+  // Callback to execute on DOM changes
+  var callback = function (mutationList) {
+    for (var mutation of mutationList) {
+      debugger;
+    }
+  }
 
-   var observer = new MutationObserver(callback);
+  var observer = new MutationObserver(callback);
 
-   observer.observe(targetNode, config);
- }
+  function breakOnChange(selector, formField) {
+    //Since we need to detect any and all DOM changes . . . bring in the MutationObserver!
+    var targetWindow = getTargetWindow();
+    if(formField){
+      var targetNode = targetWindow.document.getElementById(`element.${targetWindow.g_form.tableName}.${selector}`);
+    } else {
+      var targetNode = targetWindow.document.querySelector(selector);
+    }
+    var config = { attributes: true, childList: true, characterData: true, subtree: true };
+    observer.observe(targetNode, config);
+  }
 
- function disableSNBreakPoints() {
-   if(br) br.disable();
-   if(observer) observer.disconnect();
- }
+  function disableBreakPoint() {
+    if (observer) observer.disconnect();
+  }
 
- 
+  return {
+    breakOnChange: breakOnChange,
+    disableBreakPoint: disableBreakPoint
+  }
+
+})();
+
+
