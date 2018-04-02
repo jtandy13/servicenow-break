@@ -2,6 +2,7 @@
  * ServiceNow breakOn functions
  */
 
+ //The breakOn API let's us break on object property changes
  function breakOnValueChange(fieldName){
    var br = breakOn(g_form.getElement(fieldName), 'value');
  }
@@ -11,7 +12,7 @@
  }
 
  function breakOnReadOnlyChange(fieldName) {
-   //This may require some big guns . . . bring in the MutationObserver!
+   //Since we need to detect changes to a DOM element attribute . . . bring in the MutationObserver!
    var targetNode = document.getElementById(`${g_form.tableName}.${fieldName}`);
    //We're going to be watching attribute changes
    var config = {attributes: true};
@@ -19,7 +20,7 @@
    // Callback to execute on attribute changes
    var callback = function(mutationList) {
      for(var mutation of mutationList) {
-       if (mutation.attributeName == "class") {
+       if (mutation.attributeName == "readonly") {
          debugger;
        }
      }
