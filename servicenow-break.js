@@ -10,21 +10,21 @@
   *
   * 1. Run the script in the JavaScript console on any ServiceNow form
   * 2. Call the following code in the JavaScript console:
-  *          snowMo.breakOnChange('enter your field name here', true);
+  *          breakNow.breakOnChange('enter your field name here', true);
   *
   * Example on the incident form:
-  *          snowMo.breakOnChange('incident.state', true);
+  *          breakNow.breakOnChange('incident.state', true);
   *
   * If you're looking to break on changes of other DOM elements,
   * then set the second parameter of the breakOnChange function to false,
   * and use a CSS selector for the first parameter.
   *
   * Example:
-  *          snowMo.breakOnChange('#add_icon', false);
+  *          breakNow.breakOnChange('#add_icon', false);
   *
   */
 
-var snowMo = (() => {
+var breakNow = (() => {
 
   function getTargetWindow(){
     var targetWin;
