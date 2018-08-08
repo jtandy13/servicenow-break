@@ -26,41 +26,42 @@
 
 var breakNow = (() => {
 
-  function getTargetWindow(){
-    var targetWin;
-    if (window.g_form) {
-      targetWin = window;
-      return targetWin;
+  const getTargetFrame = (context) => {
+    let tFrame;
+    if (context.hasOwnProperty('g_form')) {
+      tFrame = context;
+      return tFrame;
     } else if (document.getElementById('gsft_main')) {
-      targetWin = document.getElementById('gsft_main').contentWindow
-      return targetWin;
+      tFrame = document.getElementById('gsft_main').contentWindow
+      return tFrame;
     } else {
-      return window;
+      return context;
     }
   }
 
   // Callback to execute on DOM changes
-  var callback = function (mutationList) {
-    for (var mutation of mutationList) {
+  const breakOnMutation = (mutationList) => {
+    for (let mutation of mutationList) {
       debugger;
     }
   }
 
-  var observer = new MutationObserver(callback);
+  const observer = new MutationObserver(breakOnMutation);
 
-  function breakOnChange(selector, formField) {
+  const breakOnChange = (selector, formField) => {
     //Since we need to detect any and all DOM changes . . . bring in the MutationObserver!
-    var targetWindow = getTargetWindow();
+    let targetWindow = getTargetFrame(window);
+    let targetNode = null;
     if(formField){
-      var targetNode = targetWindow.document.getElementById(`element.${targetWindow.g_form.tableName}.${selector}`);
+      targetNode = targetWindow.document.getElementById(`element.${targetWindow.g_form.tableName}.${selector}`);
     } else {
-      var targetNode = targetWindow.document.querySelector(selector);
+      targetNode = targetWindow.document.querySelector(selector);
     }
-    var config = { attributes: true, childList: true, characterData: true, subtree: true };
+    let config = { attributes: true, childList: true, characterData: true, subtree: true };
     observer.observe(targetNode, config);
   }
 
-  function disableBreakPoint() {
+  const disableBreakPoint = () => {
     if (observer) observer.disconnect();
   }
 
